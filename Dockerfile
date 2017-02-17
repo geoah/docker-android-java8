@@ -31,12 +31,12 @@ ENV PATH $PATH:$ANDROID_HOME/build-tools/24.0.3
 
 # Install Android SDK components
 RUN echo y | android update sdk --no-ui --all --filter \
-    "platform-tools,build-tools-23.0.3,build-tools-24.0.3,android-23,android-24" && \
+    "platform-tools,build-tools-23.0.3,build-tools-24.0.3,build-tools-25.0.1,android-23,android-24,android-25" && \
     echo y | android update sdk --no-ui --all --filter \
     "extra-android-m2repository,extra-google-m2repository,extra-android-support"
 
 # Setup Gradle
-ENV GRADLE_VERSION 3.1
+ENV GRADLE_VERSION 2.10
 RUN wget -q "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" -O gradle.zip && \
     unzip -q gradle.zip -d /opt && \
     ln -s "/opt/gradle-${GRADLE_VERSION}/bin/gradle" /usr/bin/gradle && \

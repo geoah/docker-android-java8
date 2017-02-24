@@ -19,15 +19,25 @@ ENV JAVA_HOME $JAVA8_HOME
 ENV PATH $PATH:$JAVA_HOME/bin
 
 # Download Android SDK tools
-RUN wget -q "http://dl.google.com/android/android-sdk_r24.4.1-linux.tgz" -O android-sdk.tgz && \
-    tar -xzf android-sdk.tgz -C /opt && \
-    rm android-sdk.tgz
+ADD https://dl.google.com/android/repository/tools_r25.2.3-linux.zip /opt
+RUN unzip /opt/tools_r25.2.3-linux.zip -d /opt/android-sdk-linux
+RUN rm /opt/tools_r25.2.3-linux.zip
 
 # Configure Android SDK Environment
 ENV ANDROID_HOME /opt/android-sdk-linux
 ENV PATH $PATH:$ANDROID_HOME/tools
 ENV PATH $PATH:$ANDROID_HOME/platform-tools
-ENV PATH $PATH:$ANDROID_HOME/build-tools/24.0.3
+ENV PATH $PATH:$ANDROID_HOME/build-tools/25.2.3
+
+# Adding Android License
+RUN mkdir -p "$ANDROID_HOME/licenses"
+RUN echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
+
+# Adding /root/.android/analytics.settings to avoiding gradle exceptions
+RUN mkdir -p $HOME/.android && touch $HOME/.android/analytics.settings
+
+# Adding /root/.android/repositories.cfg
+RUN mkdir -p $HOME/.android && echo "count=0" > $HOME/.android/repositories.cfg
 
 # Install Android SDK components
 RUN echo y | android update sdk --no-ui --all --filter \
@@ -36,8 +46,8 @@ RUN echo y | android update sdk --no-ui --all --filter \
     "extra-android-m2repository,extra-google-m2repository,extra-android-support"
 
 # Setup Gradle
-ENV GRADLE_VERSION 2.10
-RUN wget -q "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" -O gradle.zip && \
+ENV GRADLE_VERSION 2.14.1
+RUN wget -q "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-all.zip" -O gradle.zip && \
     unzip -q gradle.zip -d /opt && \
     ln -s "/opt/gradle-${GRADLE_VERSION}/bin/gradle" /usr/bin/gradle && \
     rm gradle.zip
